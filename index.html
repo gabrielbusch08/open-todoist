@@ -22,7 +22,10 @@
 <script>
   // Link format: https://<this page>/#<Todoist project ID>
   // The ID is after the "#", so it never reaches the server.
-  var id = location.hash.slice(1);
+  // After the "#": a bare project ID, or a whole Todoist project link pasted
+  // as is (e.g. https://app.todoist.com/app/project/notion-setup-6ghQ34VjfcV5PX8J).
+  var id = decodeURIComponent(location.hash.slice(1)).replace(/[?#].*$/, '').replace(/\/+$/, '');
+  id = id.split('/').pop().split('-').pop();
   var msg = document.getElementById('msg');
   if (/^[A-Za-z0-9]+$/.test(id)) {
     var appUrl = 'todoist://project?id=' + id;
