@@ -17,6 +17,7 @@
   <p id="msg">Opening Todoist…</p>
   <a class="button" id="app" href="#">Open in Todoist app</a>
   <p class="small"><a id="web" href="https://app.todoist.com/">Open on the web instead</a></p>
+  <p class="small" id="auto"></p>
 </main>
 <script>
   // Link format: https://<this page>/#<Todoist project ID>
@@ -27,12 +28,26 @@
     var appUrl = 'todoist://project?id=' + id;
     document.getElementById('app').href = appUrl;
     document.getElementById('web').href = 'https://app.todoist.com/app/project/' + id;
+    // Closing the tab on its own is off until this browser is told to, because
+    // Firefox's first "Open Todoist?" question also takes the focus away.
+    var auto = document.getElementById('auto');
+    var autoClose = localStorage.getItem('autoClose') === 'yes';
+    if (autoClose) {
+      auto.innerHTML = 'This tab closes itself. <a href="#" id="toggle">Stop that</a>';
+    } else {
+      auto.innerHTML = 'Once Firefox no longer asks before opening Todoist: <a href="#" id="toggle">close this tab by itself from now on</a>';
+    }
+    document.getElementById('toggle').addEventListener('click', function (e) {
+      e.preventDefault();
+      localStorage.setItem('autoClose', autoClose ? 'no' : 'yes');
+      auto.textContent = autoClose ? 'Done: the tab stays open from now on.' : 'Done: from the next link on, this tab closes itself.';
+    });
     var left = false;
     function gone() {
       if (left) return;
       left = true;
       msg.textContent = 'Opened in Todoist. You can close this tab.';
-      setTimeout(function () { window.close(); }, 300);
+      if (autoClose) setTimeout(function () { window.close(); }, 300);
     }
     window.addEventListener('blur', gone);
     document.addEventListener('visibilitychange', function () { if (document.hidden) gone(); });

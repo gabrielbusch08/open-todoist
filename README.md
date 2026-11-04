@@ -6,4 +6,4 @@ Link format: `https://gabrielbusch08.github.io/open-todoist/#<Todoist project ID
 
 The ID sits after the `#`, which browsers never send to a server. Served by GitHub Pages from `main`.
 
-To let the page close its own tab in Firefox: `about:config` → `dom.allow_scripts_to_close_windows` → `true`.
+The page closes its own tab only after the link "close this tab by itself from now on" was clicked once in that browser (kept in localStorage), because Firefox's first "Open Todoist?" question also takes the focus away.
