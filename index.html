@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Opening Todoist…</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; display: grid; place-items: center; min-height: 90vh; margin: 0; color: #333; }
+  main { text-align: center; padding: 1rem; }
+  a.button { display: inline-block; margin: .75rem 0; padding: .6rem 1.2rem; border-radius: 6px; background: #db4c3f; color: #fff; text-decoration: none; }
+  .small { font-size: .9rem; color: #777; }
+</style>
+</head>
+<body>
+<main>
+  <p id="msg">Opening Todoist…</p>
+  <a class="button" id="app" href="#">Open in Todoist app</a>
+  <p class="small"><a id="web" href="https://app.todoist.com/">Open on the web instead</a></p>
+</main>
+<script>
+  // Link format: https://<this page>/#<Todoist project ID>
+  // The ID is after the "#", so it never reaches the server.
+  var id = location.hash.slice(1);
+  var msg = document.getElementById('msg');
+  if (/^[A-Za-z0-9]+$/.test(id)) {
+    var appUrl = 'todoist://project?id=' + id;
+    document.getElementById('app').href = appUrl;
+    document.getElementById('web').href = 'https://app.todoist.com/app/project/' + id;
+    var left = false;
+    function gone() {
+      if (left) return;
+      left = true;
+      msg.textContent = 'Opened in Todoist. You can close this tab.';
+      setTimeout(function () { window.close(); }, 300);
+    }
+    window.addEventListener('blur', gone);
+    document.addEventListener('visibilitychange', function () { if (document.hidden) gone(); });
+    location.href = appUrl;
+  } else {
+    msg.textContent = 'This link has no Todoist project ID after the #.';
+    document.getElementById('app').style.display = 'none';
+  }
+</script>
+</body>
+</html>
