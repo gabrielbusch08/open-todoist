@@ -49,9 +49,13 @@
       msg.textContent = 'Opened in Todoist. You can close this tab.';
       if (autoClose) setTimeout(function () { window.close(); }, 300);
     }
-    window.addEventListener('blur', gone);
-    document.addEventListener('visibilitychange', function () { if (document.hidden) gone(); });
-    location.href = appUrl;
+    // Wait a moment first: Firefox may close a new tab whose very first step
+    // is to hand off to another app, taking its "Open Todoist?" question along.
+    setTimeout(function () {
+      window.addEventListener('blur', gone);
+      document.addEventListener('visibilitychange', function () { if (document.hidden) gone(); });
+      location.href = appUrl;
+    }, 500);
   } else {
     msg.textContent = 'This link has no Todoist project ID after the #.';
     document.getElementById('app').style.display = 'none';
