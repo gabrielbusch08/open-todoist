@@ -4,12 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="color-scheme" content="dark">
 <title>Opening Todoist…</title>
 <style>
-  body { font: 16px/1.5 system-ui, sans-serif; display: grid; place-items: center; min-height: 90vh; margin: 0; color: #333; }
+  /* Dark, like Notion's dark theme, so the tab barely shows. */
+  html, body { background: #191919; }
+  body { font: 16px/1.5 system-ui, sans-serif; display: grid; place-items: center; min-height: 90vh; margin: 0; color: #d4d4d4; }
+  a { color: #9b9b9b; }
+  body.quiet main { visibility: hidden; }
   main { text-align: center; padding: 1rem; }
   a.button { display: inline-block; margin: .75rem 0; padding: .6rem 1.2rem; border-radius: 6px; background: #db4c3f; color: #fff; text-decoration: none; }
-  .small { font-size: .9rem; color: #777; }
+  .small { font-size: .9rem; color: #7f7f7f; }
 </style>
 </head>
 <body>
@@ -35,6 +40,11 @@
     // Firefox's first "Open Todoist?" question also takes the focus away.
     var auto = document.getElementById('auto');
     var autoClose = localStorage.getItem('autoClose') === 'yes';
+    // Quiet mode: a blank dark tab. The text shows only if the app didn't take over.
+    if (autoClose) {
+      document.body.className = 'quiet';
+      setTimeout(function () { document.body.className = ''; }, 2000);
+    }
     if (autoClose) {
       auto.innerHTML = 'This tab closes itself. <a href="#" id="toggle">Stop that</a>';
     } else {
@@ -54,11 +64,12 @@
     }
     // Wait a moment first: Firefox may close a new tab whose very first step
     // is to hand off to another app, taking its "Open Todoist?" question along.
+    // Once auto-close is on, Firefox no longer asks, so the wait can be short.
     setTimeout(function () {
       window.addEventListener('blur', gone);
       document.addEventListener('visibilitychange', function () { if (document.hidden) gone(); });
       location.href = appUrl;
-    }, 500);
+    }, autoClose ? 100 : 500);
   } else {
     msg.textContent = 'This link has no Todoist project ID after the #.';
     document.getElementById('app').style.display = 'none';
