@@ -9,3 +9,5 @@ The ID sits after the `#`, which browsers never send to a server. Served by GitH
 The page closes its own tab only after the link "close this tab by itself from now on" was clicked once in that browser (kept in localStorage), because Firefox's first "Open Todoist?" question also takes the focus away.
 
 Once that's on, the page is a blank dark tab (Notion's dark grey) that hands off after 0.1 s instead of 0.5 s; its text shows only if the app hasn't taken over after 2 s.
+
+On a Windows PC with [open-folder](https://github.com/gabrielbusch08/open-folder) installed, the page sends `opentodoist:<ID>` instead, so open-folder's program opens Todoist and then puts Firefox back behind Notion. That's switched on per browser by opening `#helper-on` (open-folder's installer does it) and off with `#helper-off`. The button on the page always uses `todoist://` directly.

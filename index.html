@@ -29,11 +29,27 @@
   // The ID is after the "#", so it never reaches the server.
   // After the "#": a bare project ID, or a whole Todoist project link pasted
   // as is (e.g. https://app.todoist.com/app/project/notion-setup-6ghQ34VjfcV5PX8J).
-  var id = decodeURIComponent(location.hash.slice(1)).replace(/[?#].*$/, '').replace(/\/+$/, '');
+  // "#helper-on" / "#helper-off" (open-folder's installer opens the first):
+  // send Todoist links through open-folder on this PC, which also puts the
+  // browser back behind Notion. Kept per browser, like auto-close.
+  var hash = location.hash.slice(1);
+  if (hash === 'helper-on' || hash === 'helper-off') {
+    localStorage.setItem('helper', hash === 'helper-on' ? 'yes' : 'no');
+    // Firefox asks once about the new link type: let that question show.
+    if (hash === 'helper-on') localStorage.setItem('autoClose', 'no');
+    document.getElementById('msg').textContent = hash === 'helper-on'
+      ? 'Done: Todoist links in this browser now go through open-folder. Click one in Notion; Firefox asks once which app to use: pick open-folder and tick "Always".'
+      : 'Done: Todoist links in this browser open the Todoist app directly again.';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('web').style.display = 'none';
+    hash = '';
+  }
+  var id = decodeURIComponent(hash).replace(/[?#].*$/, '').replace(/\/+$/, '');
   id = id.split('/').pop().split('-').pop();
   var msg = document.getElementById('msg');
-  if (/^[A-Za-z0-9]+$/.test(id)) {
+  if (hash && /^[A-Za-z0-9]+$/.test(id)) {
     var appUrl = 'todoist://project?id=' + id;
+    var handoff = localStorage.getItem('helper') === 'yes' ? 'opentodoist:' + id : appUrl;
     document.getElementById('app').href = appUrl;
     document.getElementById('web').href = 'https://app.todoist.com/app/project/' + id;
     // Closing the tab on its own is off until this browser is told to, because
@@ -68,9 +84,9 @@
     setTimeout(function () {
       window.addEventListener('blur', gone);
       document.addEventListener('visibilitychange', function () { if (document.hidden) gone(); });
-      location.href = appUrl;
+      location.href = handoff;
     }, autoClose ? 100 : 500);
-  } else {
+  } else if (hash) {
     msg.textContent = 'This link has no Todoist project ID after the #.';
     document.getElementById('app').style.display = 'none';
   }
